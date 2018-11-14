@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import br.com.helpdesk.api.entity.User;
 import br.com.helpdesk.api.enums.ProfileEnum;
 import br.com.helpdesk.api.service.UserService;
+import br.com.helpdesk.api.service.exception.UserServiceException;
 
 @SpringBootApplication
 public class HelpdeskApplication {
@@ -23,7 +24,7 @@ public class HelpdeskApplication {
 	}
 	
 	//Criando usuário admin, na inicialização da aplicação.
-	private void initUser(UserService userService, PasswordEncoder passwordEncoder) {
+	private void initUser(UserService userService, PasswordEncoder passwordEncoder) throws UserServiceException {
 		User admin = new User();
 		admin.setEmail("admin@helpdesk.com");
 		admin.setPassword(passwordEncoder.encode("123456"));

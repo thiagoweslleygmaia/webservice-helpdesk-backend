@@ -6,6 +6,7 @@ import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,7 @@ import br.com.helpdesk.api.security.jwt.JwtTokenUtil;
 import br.com.helpdesk.api.service.TicketService;
 import br.com.helpdesk.api.service.UserService;
 import br.com.helpdesk.api.service.exception.TicketServiceException;
+import br.com.helpdesk.api.service.exception.UserServiceException;
 import br.com.helpdesk.api.util.MethodsUtils;
 import br.com.helpdesk.api.util.RestUtil;
 
@@ -82,7 +84,12 @@ public class TicketController {
 	private User userFromRequest(HttpServletRequest request) {
 		String token = request.getHeader("Authorization");
 		String email = jwtTokenUtil.getUserNameFromToken(token);
-		return userService.findByEmail(email);
+		try {
+			return userService.findByEmail(email);
+		} catch (UserServiceException e) {
+			Logger.getLogger(TicketController.class).error(e.getMessage());
+			return null;
+		}
 	}
 	//////////////////////////////////////////////////////////////////////
 	

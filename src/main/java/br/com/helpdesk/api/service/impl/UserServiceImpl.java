@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import br.com.helpdesk.api.entity.User;
 import br.com.helpdesk.api.repository.UserRepository;
 import br.com.helpdesk.api.service.UserService;
+import br.com.helpdesk.api.service.exception.UserServiceException;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -17,28 +18,48 @@ public class UserServiceImpl implements UserService {
 	private UserRepository userRepository;
 	
 	@Override
-	public User findByEmail(String email) {
-		return userRepository.findByEmail(email);
+	public User findByEmail(String email) throws UserServiceException {
+		try {
+			return userRepository.findByEmail(email);
+		} catch (Exception e) {
+			throw new UserServiceException("Erro ao buscar email do usuário.");
+		}
 	}
 
 	@Override
-	public User createOrUpdate(User user) {
-		return userRepository.save(user);
+	public User createOrUpdate(User user) throws UserServiceException {
+		try {
+			return userRepository.save(user);
+		} catch (Exception e) {
+			throw new UserServiceException("Erro ao salvar usuário.");
+		}
 	}
 
 	@Override
-	public User findById(String id) {
-		return userRepository.findOne(id);
+	public User findById(String id) throws UserServiceException {
+		try {
+			return userRepository.findOne(id);
+		} catch (Exception e) {
+			throw new UserServiceException("Erro ao buscar usuário.");
+		}
 	}
 
 	@Override
-	public void delete(String id) {
-		userRepository.delete(id);
+	public void delete(String id) throws UserServiceException {
+		try {
+			userRepository.delete(id);
+		} catch (Exception e) {
+			throw new UserServiceException("Erro ao deletar usuário.");
+		}
 	}
 
 	@Override
-	public Page<User> findAll(int page, int count) {
-		Pageable pages = new PageRequest(page, count);
-		return userRepository.findAll(pages);
+	public Page<User> findAll(int page, int count) throws UserServiceException {
+		try {
+			Pageable pages = new PageRequest(page, count);
+			return userRepository.findAll(pages);
+		} catch (Exception e) {
+			throw new UserServiceException("Erro ao listar usuários.");
+		}
 	}
 }

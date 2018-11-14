@@ -25,6 +25,8 @@ import br.com.helpdesk.api.security.jwt.JwtUser;
 import br.com.helpdesk.api.security.jwt.JwtUserFactory;
 import br.com.helpdesk.api.security.model.CurrentUser;
 import br.com.helpdesk.api.service.UserService;
+import br.com.helpdesk.api.service.exception.UserServiceException;
+import br.com.helpdesk.api.util.RestUtil;
 
 /**
  * AuthenticationRestController.java
@@ -65,7 +67,15 @@ public class AuthenticationRestController {
 		
 		final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
 		final String token = jwtTokenUtil.generateToken(userDetails);
-		final User user = userService.findByEmail(authenticationRequest.getEmail());
+		
+		User emailUser = new User();
+		try {
+			emailUser = userService.findByEmail(authenticationRequest.getEmail());
+		} catch (UserServiceException e) {
+			RestUtil.error(e.getMessage());
+		}
+		
+		final User user = emailUser;
 		user.setPassword(null);
 		return ResponseEntity.ok(new CurrentUser(token, user));
 	}
@@ -74,7 +84,15 @@ public class AuthenticationRestController {
 	public ResponseEntity<?> refreshAndGetAuthenticationToken(HttpServletRequest request) {
 		String token = request.getHeader("Authorization");
 		String userName = jwtTokenUtil.getUserNameFromToken(token);
-		final User user = userService.findByEmail(userName);
+		
+		User emailUser = new User();
+		try {
+			emailUser = userService.findByEmail(userName);
+		} catch (UserServiceException e) {
+			RestUtil.error(e.getMessage());
+		}
+		
+		final User user = emailUser;
 		
 		if(jwtTokenUtil.canTokenBeRefreshed(token)) {
 			String refreshedToken = jwtTokenUtil.refreshToken(token);
